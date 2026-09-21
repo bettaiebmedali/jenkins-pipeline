@@ -1,23 +1,41 @@
 pipeline {
 
-    agent {
-        dockerContainer {
-            image 'maven:3.9.9-eclipse-temurin-17'
-        }
+    agent any
+
+    parameters {
+
+        string(
+            name: 'BRANCH_NAME',
+            defaultValue: 'main',
+            description: 'Branche à construire'
+        )
+
+        choice(
+            name: 'ENV',
+            choices: ['dev', 'staging', 'prod'],
+            description: 'Environnement cible'
+        )
     }
 
     stages {
 
-        stage('Environment') {
+        stage('Build') {
+
             steps {
-                sh 'java -version'
-                sh 'mvn -version'
+
+                echo "🛠️ Build de la branche ${params.BRANCH_NAME} pour ${params.ENV}"
+
+                sh "mvn clean compile -P${params.ENV}"
             }
         }
 
         stage('Test') {
+
             steps {
-                sh 'mvn -version'
+
+                echo '✅ Exécution des tests unitaires...'
+
+                sh 'mvn test'
             }
         }
     }
