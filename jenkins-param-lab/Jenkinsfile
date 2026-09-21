@@ -1,6 +1,11 @@
 pipeline {
 
-    agent any
+    agent {
+        docker {
+            image 'maven:3.9.9-eclipse-temurin-21'
+            reuseNode true
+        }
+    }
 
     options {
         skipDefaultCheckout(true)
@@ -24,9 +29,7 @@ pipeline {
     stages {
 
         stage('Checkout') {
-
             steps {
-
                 echo "📥 Checkout de la branche ${params.BRANCH_NAME}"
 
                 git(
@@ -37,12 +40,13 @@ pipeline {
         }
 
         stage('Build') {
-
             steps {
-
                 dir('jenkins-param-lab') {
 
-                    echo "🛠️ Build de la branche ${params.BRANCH_NAME} pour ${params.ENV}"
+                    echo "🛠️ Build de ${params.BRANCH_NAME} pour ${params.ENV}"
+
+                    sh 'java -version'
+                    sh 'mvn -version'
 
                     sh "mvn clean compile -P${params.ENV}"
                 }
@@ -50,12 +54,10 @@ pipeline {
         }
 
         stage('Test') {
-
             steps {
-
                 dir('jenkins-param-lab') {
 
-                    echo '✅ Exécution des tests unitaires...'
+                    echo '✅ Exécution des tests...'
 
                     sh 'mvn test'
                 }
