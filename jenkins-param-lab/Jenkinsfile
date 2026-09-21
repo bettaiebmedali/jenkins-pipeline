@@ -4,6 +4,7 @@ pipeline {
         docker {
             image 'maven:3.9.9-eclipse-temurin-21'
             reuseNode true
+            args '-v /var/lib/jenkins/.m2:/var/maven/.m2 -e MAVEN_CONFIG=/var/maven/.m2'
         }
     }
 
