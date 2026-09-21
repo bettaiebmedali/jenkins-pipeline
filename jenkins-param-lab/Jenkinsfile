@@ -2,6 +2,10 @@ pipeline {
 
     agent any
 
+    options {
+        skipDefaultCheckout(true)
+    }
+
     parameters {
 
         string(
@@ -19,13 +23,29 @@ pipeline {
 
     stages {
 
+        stage('Checkout') {
+
+            steps {
+
+                echo "📥 Checkout de la branche ${params.BRANCH_NAME}"
+
+                git(
+                    branch: params.BRANCH_NAME,
+                    url: 'https://github.com/bettaiebmedali/jenkins-pipeline.git'
+                )
+            }
+        }
+
         stage('Build') {
 
             steps {
 
-                echo "🛠️ Build de la branche ${params.BRANCH_NAME} pour ${params.ENV}"
+                dir('jenkins-param-lab') {
 
-                sh "mvn clean compile -P${params.ENV}"
+                    echo "🛠️ Build de la branche ${params.BRANCH_NAME} pour ${params.ENV}"
+
+                    sh "mvn clean compile -P${params.ENV}"
+                }
             }
         }
 
@@ -33,9 +53,12 @@ pipeline {
 
             steps {
 
-                echo '✅ Exécution des tests unitaires...'
+                dir('jenkins-param-lab') {
 
-                sh 'mvn test'
+                    echo '✅ Exécution des tests unitaires...'
+
+                    sh 'mvn test'
+                }
             }
         }
     }
