@@ -15,7 +15,7 @@ pipeline {
 
         string(
             name: 'BRANCH_NAME',
-            defaultValue: 'main',
+            defaultValue: 'feature-test',
             description: 'Branche à construire'
         )
 
